@@ -1,6 +1,11 @@
 # coding: utf-8
 
 require 'find'
+require 'date'
+
+# load all rake tasks in lib/tasks (http://stackoverflow.com/questions/13762152/load-rake-files-and-run-tasks-from-other-files)
+Rake.add_rakelib 'lib/tasks'
+
 task :default => :preview
 
 #
