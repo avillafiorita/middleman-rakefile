@@ -35,8 +35,8 @@ desc "Build, if source or data is newer than the build dir"
 task :build do
   printf "Checking if I need to build ... "
   newest_source = newest_file "source"
-  newest_data   = newest_file "data"
-  newest_build  = File.exists?("build") ? newest_file("build") : ["not existent", Date.parse("1/1/1970")]
+  newest_data   = File.exists?("data") ? newest_file("data") : ["not existent", Time.new("1/1/1970")]
+  newest_build  = File.exists?("build") ? newest_file("build") : ["not existent", Time.new("1/1/1970")]
 
   if newest_source[1] > newest_build[1] or newest_data[1] > newest_build[1]
     printf "yes!\n"
@@ -122,7 +122,7 @@ end
 # return an array of the files changed in source since _last_deploy
 def file_changed
   content = []
-  IO.popen('find source -newer _last_deploy.txt -type f') do |io| 
+  IO.popen('find source data -newer _last_deploy.txt -type f') do |io| 
     while (line = io.gets) do
       filename = line.chomp
       if user_visible(filename) then
