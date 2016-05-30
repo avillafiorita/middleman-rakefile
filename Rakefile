@@ -74,10 +74,11 @@ task :set_env, [:env] do |_, args|
     load env_conf
     puts "Loading #{env_conf}"
   end
-  @deploy_cmd.gsub!("__build_dir__", '"' + @build_dir + '"')
+  @deploy_cmd.gsub!("__build_dir__", '"' + @build_dir + '/"')
 
   puts "Rakefile environment:"
   puts "- environment:  #{@env}"
+  puts "- specific directives in: #{env_conf} (File exists: #{File.exist?(env_conf)})"
   puts "- output dir:   #{@build_dir}"
   puts "- deploy cmd:   #{@deploy_cmd}"
   puts "- git check:    #{@git_check}"
@@ -95,7 +96,7 @@ task :build, [:env] => :set_env do |_, args|
 
   if newest_source[1] > newest_build[1] or newest_data[1] > newest_build[1]
     printf "yes!\n"
-    build @env, @build_dir
+    build_cmd
   else
     printf "no!\n"
     puts "build directory '#{@build_dir}' is newer than source."
@@ -105,7 +106,7 @@ end
 
 desc "Build!"
 task :force_build, [:env] => :set_env do |_, args|
-  build
+  build_cmd
 end
 
 desc "Deploy, if needed"
@@ -136,7 +137,7 @@ end
 
 desc "Deploy!"
 task :force_deploy, [:env] => :set_env do |_, args|
-  deploy_cmd
+  deploy_cmd 
 end
 
 desc "List the file changed since last deploy"
@@ -163,7 +164,7 @@ end
 # SUPPORT FUNCTIONS
 #
 
-def build
+def build_cmd
   system "bundle exec middleman build --build-dir=#{@build_dir} -e #{@env}"
 end
 
