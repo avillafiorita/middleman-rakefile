@@ -18,7 +18,7 @@
 #
 #     rsync -avz __build_dir__ user@example.com:/dest/dir/
 #
-@deploy_cmd = "rsync -avz __build_dir__ user@example.com:/some/dir"
+@deploy_cmd = "echo 'please set me to something like: rsync -avz __build_dir__ user@example.com:/some/dir/'"
 
 # git_check    if true, block deployment if the monitored remote branch is ahead of
 #              the current branch.  Publishing an out-of-date
@@ -142,8 +142,13 @@ end
 
 desc "List the file changed since last deploy"
 task :list_changes, [:env] => :set_env do |t, args|
-  content = file_changed @last_deploy
-  puts content.join("\n")
+  if not File.exist?(@last_deploy)
+    puts "could not find #{@last_deploy}: did you deploy for #{@environment}?"
+  else
+    content = file_changed @last_deploy
+    puts "File changed since last deploy:"
+    puts content.join("\n")
+  end
 end
 
 desc "Check timestamps"
@@ -190,7 +195,7 @@ end
 # return an array of the files changed in source since _last_deploy
 def file_changed last_deploy
   content = []
-  IO.popen('find source data -newer #{last_deploy} -type f') do |io| 
+  IO.popen("find source data -newer #{last_deploy} -type f") do |io| 
     while (line = io.gets) do
       filename = line.chomp
       if user_visible(filename) then
